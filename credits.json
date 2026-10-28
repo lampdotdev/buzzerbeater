@@ -1,0 +1,12 @@
+{
+  "remixOf" : [
+    {
+      "name" : "Buzzer Beater",
+      "starter" : "buzzerbeater",
+      "url" : "https://github.com/RooCodeInc/lamp-starter-buzzerbeater"
+    }
+  ],
+  "upstream" : [
+
+  ]
+}
