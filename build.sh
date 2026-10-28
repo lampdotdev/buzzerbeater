@@ -301,7 +301,7 @@ cat > "$APP/Contents/Info.plist" <<PLIST
 <plist version="1.0"><dict>
   <key>CFBundleDevelopmentRegion</key><string>en</string>
   <key>CFBundleExecutable</key><string>BuzzerBeater</string>
-  <key>CFBundleIdentifier</key><string>dev.lamp.dev.pensive-curie-69cf17.app.buzzerbeater</string>
+  <key>CFBundleIdentifier</key><string>dev.lamp.dev.app.buzzerbeater</string>
   <key>CFBundleName</key><string>Buzzer Beater</string>
   <key>CFBundleDisplayName</key><string>Buzzer Beater</string>
   <key>CFBundlePackageType</key><string>APPL</string>
@@ -325,6 +325,6 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <key>NSAppleMusicUsageDescription</key><string>Buzzer Beater plays music from your library.</string>
 </dict></plist>
 PLIST
-intents BuzzerBeater "$APP" "dev.lamp.dev.pensive-curie-69cf17.app.buzzerbeater" Sources
+intents BuzzerBeater "$APP" "dev.lamp.dev.app.buzzerbeater" Sources
 codesign --force -s - "$APP"
 echo "Built $APP"
