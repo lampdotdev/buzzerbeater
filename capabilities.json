@@ -1,3 +1,4 @@
 {
-  "background" : true
+  "background" : true,
+  "localNetwork" : "Finds your Roku so a close game can go on the TV."
 }

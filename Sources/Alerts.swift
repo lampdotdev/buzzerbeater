@@ -7,6 +7,9 @@ struct WatchLink: Hashable {
     var url: URL
     /// False when none of the person's services carry the game.
     var isAvailable = true
+    /// The service it opens, and the channel it's on, for opening the same on a TV (`TVs`).
+    var service: Service? = nil
+    var broadcast: String? = nil
 }
 
 extension Game {
@@ -39,46 +42,48 @@ extension Game {
 extension WatchLink {
     static func forNetwork(_ raw: String, league: League) -> WatchLink? {
         let n = raw.lowercased()
-        func link(_ name: String, _ url: String) -> WatchLink { WatchLink(label: "Watch on \(name)", url: URL(string: url)!) }
+        func link(_ name: String, _ url: String, _ service: Service) -> WatchLink {
+            WatchLink(label: "Watch on \(name)", url: URL(string: url)!, service: service, broadcast: raw)
+        }
 
         if n.contains("espn") || n == "abc" || n.contains("secn") || n.contains("sec network") || n.contains("accn") || n.contains("acc network") || n.contains("longhorn") {
-            return link("ESPN", "https://www.espn.com/watch/")
+            return link("ESPN", "https://www.espn.com/watch/", .espn)
         }
         if n.contains("peacock") || n == "nbc" || n.contains("nbcsn") || n.contains("usa net") || n == "usa" {
-            return link("Peacock", "https://www.peacocktv.com/sports")
+            return link("Peacock", "https://www.peacocktv.com/sports", .peacock)
         }
         if n.contains("paramount") || n.hasPrefix("cbs") {
-            return link("Paramount+", "https://www.paramountplus.com/live-tv/")
+            return link("Paramount+", "https://www.paramountplus.com/live-tv/", .paramount)
         }
         if n.hasPrefix("fox") || n.hasPrefix("fs1") || n.hasPrefix("fs2") || n == "btn" || n.contains("big ten") {
-            return link("Fox Sports", "https://www.foxsports.com/live")
+            return link("Fox Sports", "https://www.foxsports.com/live", .foxOne)
         }
         if n == "tnt" || n == "tbs" || n.contains("trutv") || n.contains("max") {
-            return link("HBO Max", "https://play.hbomax.com/sports")
+            return link("HBO Max", "https://play.hbomax.com/sports", .hboMax)
         }
         if n.contains("prime") || n.contains("amazon") {
-            return link("Prime Video", "https://www.amazon.com/gp/video/storefront/sports")
+            return link("Prime Video", "https://www.amazon.com/gp/video/storefront/sports", .prime)
         }
         if n.contains("apple") || n.contains("mls season pass") {
-            return link("Apple TV", "https://tv.apple.com/")
+            return link("Apple TV", "https://tv.apple.com/", .appleTV)
         }
         if n.contains("netflix") {
-            return link("Netflix", "https://www.netflix.com/")
+            return link("Netflix", "https://www.netflix.com/", .netflix)
         }
         if n.contains("youtube") {
-            return link("YouTube TV", "https://tv.youtube.com/live")
+            return link("YouTube TV", "https://tv.youtube.com/live", .youtubeTV)
         }
         if n.contains("nba tv") || n.contains("league pass") {
-            return link("NBA", "https://www.nba.com/watch")
+            return link("NBA", "https://www.nba.com/watch", .nbaLeaguePass)
         }
         if n.contains("nfl") {
-            return link("NFL+", "https://www.nfl.com/plus/")
+            return link("NFL+", "https://www.nfl.com/plus/", .nflPlus)
         }
         if n.contains("mlb") {
-            return link("MLB.TV", "https://www.mlb.com/tv")
+            return link("MLB.TV", "https://www.mlb.com/tv", .mlbTV)
         }
         if n.contains("nhl") {
-            return link("ESPN+", "https://www.espn.com/watch/")
+            return link("ESPN+", "https://www.espn.com/watch/", .espnPlus)
         }
         return nil
     }
@@ -100,8 +105,8 @@ enum Alerts {
     private static var memory = LampStore.load(AlertMemory.self, from: "alerts") ?? AlertMemory()
 
     static func setUp() {
-        LampNotifications.onAction { _, id in
-            Alerts.open(id)
+        LampNotifications.onAction { action, id in
+            if action == TVs.action { TVs.shared.show(gameID: id) } else { Alerts.open(id) }
         }
     }
 
@@ -129,7 +134,9 @@ enum Alerts {
             if watch.label != "Follow live" {
                 body += " · \(watch.label.replacingOccurrences(of: "Watch on ", with: "on "))"
             }
-            LampNotifications.send(buzz.headline, body: body, id: game.id, actions: ["Watch"])
+            // Put on the TV only when a TV of theirs has the game's app now.
+            let actions = TVs.shared.plan(for: game) == nil ? ["Watch"] : ["Watch", TVs.action]
+            LampNotifications.send(buzz.headline, body: body, id: game.id, actions: actions)
 
             memory.sent[key] = Date()
             memory.lastScore[game.id] = buzz.score

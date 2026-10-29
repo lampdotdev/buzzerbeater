@@ -177,6 +177,13 @@ enum Streaming {
     }
 
     private static func link(_ service: Service, broadcast: String, game: Game) -> WatchLink {
+        var link = watchLink(service, broadcast: broadcast, game: game)
+        link.service = service
+        link.broadcast = broadcast
+        return link
+    }
+
+    private static func watchLink(_ service: Service, broadcast: String, game: Game) -> WatchLink {
         switch service {
         case .espn, .espnPlus:
             return WatchLink(label: "Watch on ESPN", url: game.deepLink(for: service) ?? service.url ?? game.followLive)

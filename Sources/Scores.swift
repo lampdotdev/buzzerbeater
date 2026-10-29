@@ -276,6 +276,7 @@ final class Watcher: ObservableObject {
         settings = LampStore.load(WatchSettings.self, from: "settings") ?? WatchSettings()
         lines = LampStore.load([String: Line].self, from: "lines") ?? [:]
         Alerts.setUp()
+        TVs.shared.start()
         schedule = LampSchedule.every("scores", minutes: 1) {
             await Watcher.shared.refresh()
         }

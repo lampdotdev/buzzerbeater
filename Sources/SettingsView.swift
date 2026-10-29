@@ -328,6 +328,8 @@ private struct WatchTab: View {
                 }
             }
 
+            TVSection()
+
             Section {
                 Toggle("Only alert me about games I can watch", isOn: Binding(
                     get: { watcher.settings.onlyWatchable ?? false },
@@ -420,6 +422,62 @@ private struct WatchTab: View {
             list.removeAll { $0 == service.rawValue }
             if on { list.append(service.rawValue) }
             watcher.settings.services = list
+        }
+    }
+}
+
+// MARK: - TV
+
+/// The TVs a game can go on: looked for only once the person asks, since looking asks the Mac's permission.
+private struct TVSection: View {
+    @ObservedObject private var tvs = TVs.shared
+
+    var body: some View {
+        Section("TV") {
+            switch tvs.state {
+            case .off:
+                HStack {
+                    Text("Put games on your Roku")
+                    Spacer()
+                    Button("Find My Roku") { tvs.turnOn() }
+                }
+            case .looking:
+                HStack(spacing: 8) {
+                    ProgressView().controlSize(.small)
+                    Text("Looking on your Wi-Fi…").foregroundStyle(.secondary)
+                }
+            case .none:
+                HStack {
+                    Text("No Roku on this Wi-Fi").foregroundStyle(.secondary)
+                    Spacer()
+                    Button("Look Again") { Task { await tvs.look() } }
+                    Button("Stop") { tvs.turnOff() }
+                }
+            case .found:
+                ForEach(tvs.screens, id: \.id) { screen in
+                    HStack(alignment: .firstTextBaseline, spacing: 10) {
+                        Image(systemName: "tv").foregroundStyle(.secondary)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(screen.name)
+                            if let blocked = screen.blocked {
+                                Text(blocked).font(.caption).foregroundStyle(.secondary)
+                            }
+                        }
+                        Spacer()
+                        if screen.blocked == nil {
+                            Text("Ready").foregroundStyle(.secondary)
+                        } else {
+                            Image(systemName: "exclamationmark.circle.fill").foregroundStyle(.orange)
+                        }
+                    }
+                    .help(screen.model)
+                }
+                HStack {
+                    Spacer()
+                    Button("Look Again") { Task { await tvs.look() } }
+                    Button("Stop") { tvs.turnOff() }
+                }
+            }
         }
     }
 }
