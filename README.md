@@ -4,21 +4,23 @@
 
 <p align="center">A menu bar app that tells you when a live game gets close, wild or historic.</p>
 
-<p align="center"><a href="#remix-it-with-lamp">Remix it with Lamp</a> · <a href="#build-it-yourself">Build it yourself</a></p>
+<p align="center"><a href="https://lamp.dev/?repo=https://github.com/lampdotdev/buzzerbeater&amp;from=readme"><img src=".github/open-in-lamp.svg" width="164" height="48" alt="Open in Lamp"></a></p>
+
+<p align="center"><a href="#build-it-yourself">Build it yourself</a></p>
 
 <p align="center"><img src=".github/preview.png" width="720" alt="Buzzer Beater"></p>
 
 ## Make Buzzer Beater yours
 
-It's yours to change by asking Lamp. A few places to start:
+Each opens Lamp with a copy of Buzzer Beater and that change, ready to send:
 
-- Add a scoreboard desktop widget
-- Remind me before big games
-- Make it about reality TV
+- [Add a scoreboard desktop widget](https://lamp.dev/?repo=https://github.com/lampdotdev/buzzerbeater&from=readme&ask=Add%20a%20scoreboard%20desktop%20widget)
+- [Remind me before big games](https://lamp.dev/?repo=https://github.com/lampdotdev/buzzerbeater&from=readme&ask=Remind%20me%20before%20big%20games)
+- [Make it about reality TV](https://lamp.dev/?repo=https://github.com/lampdotdev/buzzerbeater&from=readme&ask=Make%20it%20about%20reality%20TV)
 
-## Remix it with Lamp
+## Open it in Lamp
 
-[Lamp](https://lamp.dev) is a Mac app that builds apps from a description and changes them as you ask. In Lamp, choose File → Open from GitHub… and paste `https://github.com/lampdotdev/buzzerbeater`: you get this exact wish, yours to change, with the credits below kept.
+[Lamp](https://lamp.dev) is a Mac app that builds apps from a description and changes them as you ask. [Open Buzzer Beater in Lamp](https://lamp.dev/?repo=https://github.com/lampdotdev/buzzerbeater&from=readme) for a copy of your own, to use and to change as you like, with the credits below kept. Or, in Lamp, choose File → Open from GitHub… and paste `https://github.com/lampdotdev/buzzerbeater`.
 
 ## Build it yourself
 
