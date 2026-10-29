@@ -171,6 +171,7 @@ private struct ContentHeight: PreferenceKey {
 
 private struct HotGameCard: View {
     let game: Game
+    @ObservedObject private var tvs = TVs.shared
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -230,6 +231,9 @@ private struct HotGameCard: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
             }
+            if !ended {
+                TVLine(game: game, tvs: tvs)
+            }
         }
         .padding(10)
         .background((ended ? Color.secondary : Color.orange).opacity(0.08), in: RoundedRectangle(cornerRadius: 10))
@@ -244,6 +248,40 @@ private struct HotGameCard: View {
 
     private var ended: Bool { game.state == .post }
     private var detail: GameDetail? { Watcher.shared.details[game.id] }
+}
+
+/// Puts the game on the person's TV, shown only when one of theirs has the game's app (`TVs.plan`), saying plainly
+/// where it stops: "Open ESPN on the TV" when the TV opens the app and the person picks the game there.
+private struct TVLine: View {
+    let game: Game
+    @ObservedObject var tvs: TVs
+
+    var body: some View {
+        if let result = tvs.results[game.id] {
+            Label(result, systemImage: "tv")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+        } else if let plan = tvs.plan(for: game) {
+            Button {
+                tvs.show(game)
+            } label: {
+                HStack(spacing: 5) {
+                    if tvs.sending.contains(game.id) {
+                        ProgressView().controlSize(.mini)
+                    } else {
+                        Image(systemName: "tv")
+                    }
+                    Text(tvs.label(for: plan))
+                }
+            }
+            .buttonStyle(.borderless)
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(Color.orange)
+            .disabled(tvs.sending.contains(game.id))
+            .help(plan.reachesGame ? "Starts the game on \(plan.screenName)" : "Opens \(plan.app.name) on \(plan.screenName), where you pick the game")
+        }
+    }
 }
 
 /// Opens the full game highlights once ESPN posts them.
