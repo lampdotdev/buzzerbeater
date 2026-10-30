@@ -4,6 +4,10 @@ import SwiftUI
 struct MainApp: SwiftUI.App {
     @StateObject private var watcher = Watcher.shared
 
+    init() {
+        if LampShowcase.isOn { Task { @MainActor in ScriptedGames.openWindow() } }
+    }
+
     var body: some SwiftUI.Scene {
         LampMenuBar {
             PanelView().environmentObject(watcher)

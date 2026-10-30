@@ -276,14 +276,39 @@ final class Watcher: ObservableObject {
         settings = LampStore.load(WatchSettings.self, from: "settings") ?? WatchSettings()
         lines = LampStore.load([String: Line].self, from: "lines") ?? [:]
         Alerts.setUp()
+        if LampShowcase.isOn {
+            Task { await playScript() }
+            return
+        }
         schedule = LampSchedule.every("scores", minutes: 1) {
             await Watcher.shared.refresh()
         }
         Task { await refresh() }
     }
 
+    /// A reel's games, each moment at its time in the recording, gone through what real scores go through.
+    private func playScript() async {
+        var at = 0.0
+        for frame in ScriptedGames.frames {
+            if frame.after > 0 {
+                while LampShowcase.file("recording") == nil { try? await Task.sleep(for: .milliseconds(100)) }
+                try? await Task.sleep(for: .seconds(frame.after - at))
+                at = frame.after
+            }
+            for (id, play) in frame.plays ?? [:] { details[id, default: GameDetail()].keyPlay = play }
+            for (id, chance) in frame.chances ?? [:] { details[id, default: GameDetail()].winProbability = [WinPoint(home: chance, at: nil)] }
+            games = frame.games.map { game in
+                var game = game
+                game.buzz = Excitement.evaluate(game, favorites: [], detail: details[game.id])
+                return game
+            }
+            lastUpdated = Date()
+            Alerts.consider(hotGames)
+        }
+    }
+
     func refresh() async {
-        guard !isLoading else { return }
+        guard !LampShowcase.isOn, !isLoading else { return }
         isLoading = true
         defer { isLoading = false }
 
